@@ -1,0 +1,19 @@
+project_name: locom
+
+builds:
+  - main: ./main.go
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+    ldflags: "-s -w"
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: localcompose
+    name: locom
