@@ -1,5 +1,20 @@
 project_name: locom
 
+release:
+  github:
+    owner: localcompose
+    name: locom
+
+brews:
+  - name: locom
+    repository:
+      owner: localcompose
+      name: homebrew-locom
+    homepage: "https://github.com/localcompose/locom"
+    description: "Local-only Docker Compose stack manager"
+    test: |
+      locom help
+
 builds:
   - main: ./main.go
     goos: [darwin, linux, windows]
@@ -12,8 +27,3 @@ archives:
 
 checksum:
   name_template: "checksums.txt"
-
-release:
-  github:
-    owner: localcompose
-    name: locom
