@@ -9,7 +9,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "locom",
-	Short: "locom manages local Docker Compose stacks",
+	Short: "locom manages a local stage of Docker Compose stacks",
 	Long:  `locom is a CLI tool for managing local Docker Compose stacks in a minimal, offline-friendly way.`,
 }
 
