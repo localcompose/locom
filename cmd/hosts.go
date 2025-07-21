@@ -8,25 +8,30 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"net"
+	"time"
+	"syscall"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	rootCmd.AddCommand(cmdHosts)
-}
-
 var cmdHosts = &cobra.Command{
 	Use:   "hosts",
 	Short: "Update /etc/hosts with entries from locom stage",
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runHosts()
+		return runHosts(cmd)
 	},
 }
 
-func runHosts() error {
+func init() {
+	cmdHosts.Flags().Bool("verify", false, "Check if the DNS name resolves and responds")
+	rootCmd.AddCommand(cmdHosts)
+}
+
+func runHosts(cmd *cobra.Command) error {
 	configPath := ".locom/locom.yml"
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		return errors.New("This folder does not contain locom stage configuration.")
@@ -110,11 +115,11 @@ func runHosts() error {
 		return fmt.Errorf("writing temp hosts file: %w", err)
 	}
 
-	cmd := exec.Command("sudo", "cp", tmpHosts.Name(), hostsPath)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	cpCmd := exec.Command("sudo", "cp", tmpHosts.Name(), hostsPath)
+	cpCmd.Stdin = os.Stdin
+	cpCmd.Stdout = os.Stdout
+	cpCmd.Stderr = os.Stderr
+	if err := cpCmd.Run(); err != nil {
 		return fmt.Errorf("updating /etc/hosts with sudo: %w", err)
 	}
 
@@ -124,5 +129,55 @@ func runHosts() error {
 	}
 
 	fmt.Println("✅ Hosts file updated with locom stage entries.")
+
+	verify, _ := cmd.Flags().GetBool("verify")
+	if verify {
+		fqdn := "proxy" + suffix
+		if err := verifyHost(address, fqdn); err != nil {
+			return fmt.Errorf("verification failed: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func verifyHost(expectedAddr, fqdn string) error {
+	fmt.Printf("🔍 Verifying DNS resolution for %s...\n", fqdn)
+
+	ips, err := net.LookupHost(fqdn)
+	if err != nil {
+		return fmt.Errorf("DNS resolution failed for %s: %w", fqdn, err)
+	}
+
+	match := false
+	for _, ip := range ips {
+		if ip == expectedAddr {
+			match = true
+			break
+		}
+	}
+	if !match {
+		return fmt.Errorf("DNS %s resolved to %v, expected %s", fqdn, ips, expectedAddr)
+	}
+
+	fmt.Printf("✅ DNS resolution successful: %s → %s\n", fqdn, expectedAddr)
+
+	// Optional: attempt TCP connection to verify routing
+	addr := net.JoinHostPort(fqdn, "80")
+	conn, err := net.DialTimeout("tcp", addr, 1*time.Second)
+	if conn != nil {
+		defer conn.Close()
+	}
+	if err != nil {
+		if opErr, ok := err.(*net.OpError); ok {
+			if errors.Is(opErr.Err, syscall.ECONNREFUSED) {
+				fmt.Printf("⚠️ TCP Connection to %s at port 80 refused (no service), but DNS resolution succeeded.\n", addr)
+				return nil
+			}
+		}
+		fmt.Printf("⚠️ TCP connection failed to %s: %w", addr, err)
+		return nil
+	}
+	fmt.Printf("✅ TCP connection successful to %s\n", addr)
 	return nil
 }
