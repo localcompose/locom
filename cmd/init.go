@@ -86,7 +86,7 @@ func isDirEmpty(path string) (bool, error) {
 	return true, nil
 }
 
-const defaultConfig = `platform:
+const defaultConfig = `stage:
   network:
     name: locom
 
