@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+
+	"github.com/localcompose/locom/config" 
 )
 
 var cmdNetwork = &cobra.Command{
@@ -14,7 +16,7 @@ var cmdNetwork = &cobra.Command{
 	Short: "Ensure the Docker network defined in .locom/locom.yml exists",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		configPath := filepath.Join(".locom", "locom.yml")
-		cfg, err := loadConfig(configPath)
+		cfg, err := config.LoadConfig(configPath)
 		if err != nil {
 			return fmt.Errorf("loading config: %w", err)
 		}

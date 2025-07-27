@@ -7,6 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
+
+	"github.com/localcompose/locom/config" 
 )
 
 func init() {
@@ -24,7 +26,7 @@ var cmdProxy = &cobra.Command{
 
 func runProxy(targetDir string) error {
 	configPath := filepath.Join(".locom", "locom.yml")
-	cfg, err := loadConfig(configPath)
+	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
 		return fmt.Errorf("loading configuration: %w", err)
 	}
@@ -54,27 +56,6 @@ func runProxy(targetDir string) error {
 	return nil
 }
 
-func loadConfig(configPath string) (*Config, error) {
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		return nil, fmt.Errorf("reading config: %w", err)
-	}
-
-	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, fmt.Errorf("parsing yaml: %w", err)
-	}
-
-	return &cfg, nil
-}
-
-type Config struct {
-	Stage struct {
-		Network struct {
-			Name string `yaml:"name"`
-		} `yaml:"network"`
-	} `yaml:"stage"`
-}
 func getTraefikComposeWithNetwork(network string) map[string]interface{} {
 	return map[string]interface{}{
 		"networks": map[string]interface{}{
