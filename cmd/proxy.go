@@ -23,13 +23,23 @@ var cmdProxy = &cobra.Command{
 }
 
 func runProxy(targetDir string) error {
+	configPath := filepath.Join(".locom", "locom.yml")
+	cfg, err := loadConfig(configPath)
+	if err != nil {
+		return fmt.Errorf("loading configuration: %w", err)
+	}
+
+	networkName := cfg.Stage.Network.Name
+	if networkName == "" {
+		return fmt.Errorf("network name not found in configuration")
+	}
+
 	if err := os.MkdirAll(targetDir, 0755); err != nil {
 		return fmt.Errorf("creating proxy folder: %w", err)
 	}
 
-	compose := getDefaultTraefikCompose()
+	compose := getTraefikComposeWithNetwork(networkName)
 
-	// Marshal to YAML
 	ymlData, err := yaml.Marshal(compose)
 	if err != nil {
 		return fmt.Errorf("serializing yaml: %w", err)
@@ -44,11 +54,31 @@ func runProxy(targetDir string) error {
 	return nil
 }
 
-func getDefaultTraefikCompose() map[string]interface{} {
+func loadConfig(configPath string) (*Config, error) {
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, fmt.Errorf("reading config: %w", err)
+	}
+
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, fmt.Errorf("parsing yaml: %w", err)
+	}
+
+	return &cfg, nil
+}
+
+type Config struct {
+	Stage struct {
+		Network struct {
+			Name string `yaml:"name"`
+		} `yaml:"network"`
+	} `yaml:"stage"`
+}
+func getTraefikComposeWithNetwork(network string) map[string]interface{} {
 	return map[string]interface{}{
-		"version": "3.8",
 		"networks": map[string]interface{}{
-			"locom": map[string]interface{}{
+			network: map[string]interface{}{
 				"external": true,
 			},
 		},
@@ -77,7 +107,7 @@ func getDefaultTraefikCompose() map[string]interface{} {
 					"./config:/etc/traefik/dynamic",
 				},
 				"networks": []string{
-					"locom",
+					network,
 				},
 				"labels": map[string]string{
 					"traefik.enable":                           "true",
@@ -89,4 +119,3 @@ func getDefaultTraefikCompose() map[string]interface{} {
 		},
 	}
 }
-
