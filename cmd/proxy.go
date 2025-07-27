@@ -48,7 +48,7 @@ func getDefaultTraefikCompose() map[string]interface{} {
 	return map[string]interface{}{
 		"version": "3.8",
 		"networks": map[string]interface{}{
-			"proxy": map[string]interface{}{
+			"locom": map[string]interface{}{
 				"external": true,
 			},
 		},
@@ -77,7 +77,7 @@ func getDefaultTraefikCompose() map[string]interface{} {
 					"./config:/etc/traefik/dynamic",
 				},
 				"networks": []string{
-					"proxy",
+					"locom",
 				},
 				"labels": map[string]string{
 					"traefik.enable":                           "true",
