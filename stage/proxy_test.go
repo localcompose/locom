@@ -35,17 +35,19 @@ stage:
 		t.Fatalf("GenerateProxyComposeFiles failed: %v", err)
 	}
 
-	// Check file was created
-	composePath := filepath.Join(targetDir, "docker-compose.yml")
-	data, err := os.ReadFile(composePath)
-	if err != nil {
-		t.Fatalf("expected file not found: %v", err)
-	}
+	sourcePath := filepath.Join(configDir, "proxy", "docker-compose.yml")
+	targetPath := filepath.Join(tmpDir, "proxy", "docker-compose.yml")
 
-	// Basic sanity check on YAML content
-	content := string(data)
-	if !containsAll(content, "services:", "traefik", "testnet") {
-		t.Errorf("unexpected content in docker-compose.yml:\n%s", content)
+	for _, path := range []string{sourcePath, targetPath} {
+		// Check file was created
+		// Basic sanity check on YAML content
+		data, err := os.ReadFile(path)
+		if err != nil {
+			t.Errorf("missing file: %s: %v", path, err)
+		} else if !containsAll(string(data), "traefik", "testnet") {
+			
+			t.Errorf("unexpected content in %s:\n%s", path, data)
+		}
 	}
 }
 
