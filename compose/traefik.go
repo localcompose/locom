@@ -1,18 +1,13 @@
 package compose
 
-func GetTraefikCompose(network string) map[string]interface{} {
-	return map[string]interface{}{
-		"networks": map[string]interface{}{
-			network: map[string]interface{}{
-				"external": true,
-			},
-		},
-		"services": map[string]interface{}{
-			"traefik": map[string]interface{}{
-				"image":          "traefik:v2.10",
-				"container_name": "traefik",
-				"restart":        "unless-stopped",
-				"command": []string{
+func GetTraefikCompose(networkName string) ComposeFile {
+	return ComposeFile{
+		Services: map[string]Service{
+			"traefik": {
+				Image:         "traefik:v2.10",
+				ContainerName: "traefik",
+				Restart:       "unless-stopped",
+				Command: []string{
 					"--api.dashboard=true",
 					"--api.insecure=true",
 					"--providers.docker=true",
@@ -22,25 +17,26 @@ func GetTraefikCompose(network string) map[string]interface{} {
 					"--providers.file.directory=/etc/traefik/dynamic",
 					"--providers.file.watch=true",
 				},
-				"ports": []string{
+				Ports: []string{
 					"80:80",
 					"443:443",
 					"8080:8080",
 				},
-				"volumes": []string{
+				Volumes: []string{
 					"/var/run/docker.sock:/var/run/docker.sock:ro",
 					"./config:/etc/traefik/dynamic",
 				},
-				"networks": []string{
-					network,
-				},
-				"labels": map[string]string{
+				Networks: []string{networkName},
+				Labels: map[string]string{
 					"traefik.enable":                           "true",
 					"traefik.http.routers.traefik.rule":        "Host(`proxy.locom.self`)",
 					"traefik.http.routers.traefik.service":     "api@internal",
 					"traefik.http.routers.traefik.entrypoints": "web",
 				},
 			},
+		},
+		Networks: map[string]ExternalNetwork{
+			networkName: {External: true},
 		},
 	}
 }
