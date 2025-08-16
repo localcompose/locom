@@ -2,6 +2,9 @@ package compose
 
 func GetTraefikCompose(networkName string) ComposeFile {
 	return ComposeFile{
+		Networks: map[string]ExternalNetwork{
+			networkName: {External: true},
+		},
 		Services: map[string]Service{
 			"traefik": {
 				Image:         "traefik:v2.10",
@@ -34,9 +37,6 @@ func GetTraefikCompose(networkName string) ComposeFile {
 					"traefik.http.routers.traefik.entrypoints": "web",
 				},
 			},
-		},
-		Networks: map[string]ExternalNetwork{
-			networkName: {External: true},
 		},
 	}
 }
