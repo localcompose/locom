@@ -175,7 +175,7 @@ func verifyHost(expectedAddr, fqdn string) error {
 				return nil
 			}
 		}
-		fmt.Printf("⚠️ TCP connection failed to %s: %w", addr, err)
+		fmt.Printf("⚠️ TCP connection failed to %s: %v", addr, err)
 		return nil
 	}
 	fmt.Printf("✅ TCP connection successful to %s\n", addr)
