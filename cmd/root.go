@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var main struct {Name string; Version string}
+
 var rootCmd = &cobra.Command{
 	Use:   "locom",
 	Short: "locom manages a local stage of Docker Compose stacks",
@@ -14,7 +16,9 @@ var rootCmd = &cobra.Command{
 }
 
 // Execute runs the root command
-func Execute() {
+func Execute(name, version string) {
+	main.Name = name
+	main.Version = version
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
