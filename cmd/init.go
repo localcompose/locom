@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/localcompose/locom/stage"
+	"github.com/spf13/cobra"
 )
 
 func init() {

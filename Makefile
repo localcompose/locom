@@ -53,7 +53,7 @@ help:
 ## Format Go code and tidy go.mod
 fmt:
 	go mod tidy
-	go fmt
+	go fmt ./...
 
 .PHONY: build
 ## Build the Go binary into the output directory

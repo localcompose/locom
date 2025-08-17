@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"net"
-	"time"
 	"syscall"
+	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -18,8 +18,8 @@ import (
 )
 
 var cmdHosts = &cobra.Command{
-	Use:   "hosts",
-	Short: "Update /etc/hosts with entries from locom stage",
+	Use:          "hosts",
+	Short:        "Update /etc/hosts with entries from locom stage",
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return runHosts(cmd)

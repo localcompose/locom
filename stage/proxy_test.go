@@ -45,7 +45,7 @@ stage:
 		if err != nil {
 			t.Errorf("missing file: %s: %v", path, err)
 		} else if !containsAll(string(data), "traefik", "testnet") {
-			
+
 			t.Errorf("unexpected content in %s:\n%s", path, data)
 		}
 	}

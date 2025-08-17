@@ -1,9 +1,9 @@
 package compose
 
 type ComposeFile struct {
-	Version  string                      `yaml:"version,omitempty"`
-	Networks map[string]ExternalNetwork  `yaml:"networks"`
-	Services map[string]Service          `yaml:"services"`
+	Version  string                     `yaml:"version,omitempty"`
+	Networks map[string]ExternalNetwork `yaml:"networks"`
+	Services map[string]Service         `yaml:"services"`
 }
 
 type Service struct {
