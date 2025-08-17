@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'locom/*.*.*'
 
 jobs:
   release:
@@ -23,6 +23,6 @@ jobs:
 
       - name: Run GoReleaser
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # needed for GitHub releases
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           goreleaser release --rm-dist

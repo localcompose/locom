@@ -7,7 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var main struct {Name string; Version string}
+var main struct {
+	Name    string
+	Version string
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "locom",

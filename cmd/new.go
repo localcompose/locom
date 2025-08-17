@@ -15,7 +15,7 @@ func init() {
 var cmdNew = &cobra.Command{
 	Use:   "new",
 	Short: "Create a new configuration",
-	Run: runNew,
+	Run:   runNew,
 }
 
 func runNew(cmd *cobra.Command, args []string) {

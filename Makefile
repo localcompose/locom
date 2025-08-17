@@ -1,12 +1,15 @@
 # Makefile
 MAIN_NAME := $(shell basename $(shell git remote get-url origin) .git)
+MAIN_PREFIX := $(MAIN_NAME)/
 MAIN_VERSION := $(shell \
-  tag=$$(git describe --tags --abbrev=0 2>/dev/null || echo notags); \
+  prefix=$$(echo $(MAIN_PREFIX)); \
+  tag=$$(git describe --tags --abbrev=0  --match "$${prefix}*" 2>/dev/null || echo notags); \
   tagged_commit=$$(git rev-list -n 1 $$tag 2>/dev/null || echo ""); \
   current_commit=$$(git rev-parse HEAD); \
   short_commit=$$(git rev-parse --short HEAD); \
+  version=$${tag#$$prefix}; \
   pre=""; \
-  base=$$tag; \
+  base=$$version; \
   if echo $$tag | grep -q '-'; then \
     pre=$${tag#*-}; \
     base=$${tag%-*}; \
@@ -53,7 +56,7 @@ help:
 ## Format Go code and tidy go.mod
 fmt:
 	go mod tidy
-	go fmt
+	go fmt ./...
 
 .PHONY: build
 ## Build the Go binary into the output directory
