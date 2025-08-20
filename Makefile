@@ -1,10 +1,4 @@
-# Makefile
-MAIN_NAME := $(shell basename $(shell git remote get-url origin) .git)
-MAIN_PREFIX := $(MAIN_NAME)/
-MAIN_VERSION := $(shell chmod +x ./scripts/version.sh 2>/dev/null; ./scripts/version.sh)
-
-BINARY_NAME := $(MAIN_NAME)
-OUTPUT_DIR := dist
+MAKEFILE_LIST ?= Makefile
 
 .PHONY: help
 ## Show this help message
@@ -19,6 +13,14 @@ help:
 			help_seen = 0; \
 		} \
 	' $(MAKEFILE_LIST)
+
+# Makefile
+MAIN_NAME := $(shell basename $(shell git remote get-url origin) .git)
+MAIN_PREFIX := $(MAIN_NAME)/
+MAIN_VERSION := $(shell chmod +x ./scripts/version.sh 2>/dev/null; ./scripts/version.sh)
+
+BINARY_NAME := $(MAIN_NAME)
+OUTPUT_DIR := dist
 
 .PHONY: fmt
 ## Format Go code and tidy go.mod

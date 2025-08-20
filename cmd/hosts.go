@@ -158,6 +158,7 @@ func runHosts(cmd *cobra.Command) error {
 }
 
 var tryRunAsAdmin = true
+
 func rerunAsAdmin(origErr error, tryRunAsAdmin bool) error {
 	exe, _ := os.Executable()
 	args := strings.Join(os.Args[1:], " ")
