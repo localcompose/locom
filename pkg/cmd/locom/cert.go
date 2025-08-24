@@ -1,4 +1,4 @@
-package cmd
+package locom
 
 import (
 	"github.com/localcompose/locom/cert/selfsigned"

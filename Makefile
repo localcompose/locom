@@ -31,7 +31,8 @@ fmt:
 ## Build the Go binary into the output directory
 build:
 	go build -o $(OUTPUT_DIR)/ \
-		-ldflags "-X main.Name=$(MAIN_NAME) -X main.Version=$(MAIN_VERSION)"
+		-ldflags "-X main.Name=$(MAIN_NAME) -X main.Version=$(MAIN_VERSION)" \
+		./cmd/locom
 
 .PHONY: test
 ## Run all Go tests
