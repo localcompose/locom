@@ -61,7 +61,7 @@ func runHosts(cmd *cobra.Command) error {
 	address := parsed.Stage.Network.Bind.Address
 	suffix := parsed.Stage.Network.DNS.Suffix
 	if address == "" || suffix == "" {
-		return errors.New("Missing required fields in locom.yml (stage.network.bind.address or stage.network.dns.suffix)")
+		return errors.New("missing required fields in locom.yml (stage.network.bind.address or stage.network.dns.suffix)")
 	}
 
 	cwd, err := os.Getwd()

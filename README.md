@@ -125,7 +125,7 @@ cd $LOCOM_STAGE
 
 ```sh
 sudo $(which locom) network
-locom hosts
+locom hosts --verify
 locom proxy
 locom cert selfsigned setup
 locom cert selfsigned trust
@@ -138,7 +138,7 @@ locom cert selfsigned trust
 
 ```sh
 locom network
-locom hosts
+locom hosts --verify
 locom proxy
 locom cert selfsigned setup
 locom cert selfsigned trust
@@ -150,7 +150,7 @@ locom cert selfsigned trust
 
 ```sh
 locom network
-locom hosts
+locom hosts --verify
 locom proxy
 locom cert selfsigned setup
 locom cert selfsigned trust
