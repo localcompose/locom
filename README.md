@@ -121,7 +121,11 @@ cd $LOCOM_STAGE
 ```
 
 <details>
-<summary>linux</summary>
+<summary>linux (Ubuntu)</summary>
+
+Tested on Ubuntu, but may work on other distros without change.
+
+Some commands need sudo on id docker installed by snap.
 
 ```sh
 sudo $(which locom) network
@@ -129,6 +133,9 @@ locom hosts --verify
 locom proxy
 locom cert selfsigned setup
 locom cert selfsigned trust
+
+cd proxy
+sudo docker compose up -d
 ```
 
 </details>
@@ -142,6 +149,9 @@ locom hosts --verify
 locom proxy
 locom cert selfsigned setup
 locom cert selfsigned trust
+
+cd proxy
+docker compose up -d
 ```
 </details>
 
@@ -154,19 +164,16 @@ locom hosts --verify
 locom proxy
 locom cert selfsigned setup
 locom cert selfsigned trust
+
+cd proxy
+docker compose up -d
 ```
 </details>
 
 ## test
 
 ```sh
-cd proxy
-sudo docker compose up -d
-
 open https://proxy.locom.self
-
-sudo docker compose down
-cd ..
 ```
 
 <details>
@@ -187,9 +194,14 @@ curl -s -o /dev/null -w "%{http_code}\n" https://proxy.locom.self
 ## cleanup
 
 <details>
-<summary>linux</summary>
+<summary>linux (Ubuntu)</summary>
+
+Tested on Ubuntu, but may work on other distros without change.
 
 ```sh
+sudo docker compose down
+cd ..
+
 locom cert selfsigned untrust
 ```
 
@@ -199,6 +211,9 @@ locom cert selfsigned untrust
 <summary>darwin</summary>
 
 ```sh
+docker compose down
+cd ..
+
 locom cert selfsigned untrust
 ```
 </details>
@@ -207,6 +222,9 @@ locom cert selfsigned untrust
 <summary>windows</summary>
 
 ```sh
+docker compose down
+cd ..
+
 locom cert selfsigned untrust
 ```
 </details>
