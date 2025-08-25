@@ -7,8 +7,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/localcompose/locom/compose"
-	"github.com/localcompose/locom/config"
+	"github.com/localcompose/locom/internal/config"
+	"github.com/localcompose/locom/internal/compose"
 )
 
 func GenerateProxyComposeFiles(configPath, targetDir string) error {

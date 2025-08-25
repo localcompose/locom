@@ -1,7 +1,7 @@
 package locom
 
 import (
-	"github.com/localcompose/locom/cert/selfsigned"
+	"github.com/localcompose/locom/internal/cert/selfsigned"
 	"github.com/spf13/cobra"
 )
 

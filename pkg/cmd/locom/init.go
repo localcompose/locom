@@ -1,7 +1,7 @@
 package locom
 
 import (
-	"github.com/localcompose/locom/stage"
+	"github.com/localcompose/locom/internal/stage"
 	"github.com/spf13/cobra"
 )
 
