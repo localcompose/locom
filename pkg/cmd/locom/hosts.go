@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -74,7 +75,7 @@ func runHosts(cmd *cobra.Command) error {
 	endMarker := fmt.Sprintf("# <<< locom %s loopback apps <<<", project)
 	entry := fmt.Sprintf("%s proxy%s", address, suffix)
 
-	hostsPath := "/etc/hosts"
+	hostsPath := getHostsPath()
 	tmpHosts, err := os.CreateTemp("", "hosts.*")
 	if err != nil {
 		return fmt.Errorf("creating temp file: %w", err)
@@ -179,4 +180,21 @@ func verifyHost(expectedAddr, fqdn string) error {
 	}
 	fmt.Printf("✅ TCP connection successful to %s\n", addr)
 	return nil
+}
+
+func getHostsPath() string {
+	switch runtime.GOOS {
+	case "windows":
+		return windowsGetHostsPath()
+	}
+	return "/etc/hosts"
+}
+
+func windowsGetHostsPath() string {
+	hostsPath := `C:\Windows\System32\drivers\etc\hosts`
+	// if _, err := os.Stat(hostsPath); err != nil {
+	// 	// if System32 is redirected, fall back to Sysnative
+	// 	hostsPath = `C:\Windows\Sysnative\drivers\etc\hosts`
+	// }
+	return hostsPath
 }
