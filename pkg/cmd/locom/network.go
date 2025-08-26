@@ -1,4 +1,4 @@
-package cmd
+package locom
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/localcompose/locom/config"
+	"github.com/localcompose/locom/internal/config"
 )
 
 var cmdNetwork = &cobra.Command{

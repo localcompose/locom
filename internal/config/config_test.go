@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/localcompose/locom/config"
+	"github.com/localcompose/locom/internal/config"
 	"github.com/stretchr/testify/require"
 )
 
