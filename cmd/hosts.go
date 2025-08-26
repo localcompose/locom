@@ -6,11 +6,11 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
+	"unsafe"
 
 	"gopkg.in/yaml.v3"
 
@@ -75,7 +75,13 @@ func runHosts(cmd *cobra.Command) error {
 	endMarker := fmt.Sprintf("# <<< locom %s loopback apps <<<", project)
 	entry := fmt.Sprintf("%s proxy%s", address, suffix)
 
-	hostsPath := "/etc/hosts"
+	// hostsPath := `C:\Windows\System32\drivers\etc\hosts` // "C:\\Program Files\\Git\\etc\\hosts" // "/etc/hosts"
+	hostsPath := `C:\Windows\System32\drivers\etc\hosts`
+	if _, err := os.Stat(hostsPath); err != nil {
+		// if System32 is redirected, fall back to Sysnative
+		hostsPath = `C:\Windows\Sysnative\drivers\etc\hosts`
+	}
+
 	tmpHosts, err := os.CreateTemp("", "hosts.*")
 	if err != nil {
 		return fmt.Errorf("creating temp file: %w", err)
@@ -87,7 +93,12 @@ func runHosts(cmd *cobra.Command) error {
 		return fmt.Errorf("reading /etc/hosts: %w", err)
 	}
 
-	lines := strings.Split(string(hostsContent), "\n")
+	sep := "\n"
+	if strings.Contains(string(hostsContent), "\r\n") {
+		sep = "\r\n"
+	}
+
+	lines := strings.Split(string(hostsContent), sep)
 	inBlock := false
 	var newLines []string
 	for _, line := range lines {
@@ -110,17 +121,22 @@ func runHosts(cmd *cobra.Command) error {
 		endMarker,
 	)
 
-	updated := strings.Join(newLines, "\n") + "\n"
-	if err := ioutil.WriteFile(tmpHosts.Name(), []byte(updated), 0644); err != nil {
-		return fmt.Errorf("writing temp hosts file: %w", err)
-	}
+	updated := strings.Join(newLines, sep) + sep
 
-	cpCmd := exec.Command("sudo", "cp", tmpHosts.Name(), hostsPath)
-	cpCmd.Stdin = os.Stdin
-	cpCmd.Stdout = os.Stdout
-	cpCmd.Stderr = os.Stderr
-	if err := cpCmd.Run(); err != nil {
-		return fmt.Errorf("updating /etc/hosts with sudo: %w", err)
+	f, err := os.OpenFile(hostsPath, os.O_WRONLY|os.O_TRUNC, 0)
+	if err != nil {
+		if errors.Is(err, syscall.ERROR_ACCESS_DENIED) {
+			return rerunAsAdmin(err, tryRunAsAdmin)
+		}
+		return fmt.Errorf("opening hosts file for write: %w", err)
+	}
+	defer f.Close()
+
+	if _, err := f.Write([]byte(updated)); err != nil {
+		if errors.Is(err, syscall.ERROR_ACCESS_DENIED) {
+			return rerunAsAdmin(err, tryRunAsAdmin)
+		}
+		return fmt.Errorf("writing hosts file: %w", err)
 	}
 
 	statePath := ".locom/hosts"
@@ -138,6 +154,50 @@ func runHosts(cmd *cobra.Command) error {
 		}
 	}
 
+	return nil
+}
+
+var tryRunAsAdmin = true
+
+func rerunAsAdmin(origErr error, tryRunAsAdmin bool) error {
+	exe, _ := os.Executable()
+	args := strings.Join(os.Args[1:], " ")
+
+	if tryRunAsAdmin {
+		// silently re-run as admin
+		if err := runAsAdmin(exe, args); err != nil {
+			return fmt.Errorf("access denied, tried to elevate: %w", err)
+		}
+		os.Exit(0) // stop current process, elevated one continues
+	}
+
+	// suggest the command instead
+	fmt.Printf("\nAccess denied while writing hosts file.\n")
+	fmt.Printf("You can retry with Administrator rights:\n\n")
+	fmt.Printf("  runas /user:Administrator \"%s %s\"\n\n", exe, args)
+	return origErr
+}
+
+func runAsAdmin(exePath, args string) error {
+	verbPtr, _ := syscall.UTF16PtrFromString("runas")
+	exePtr, _ := syscall.UTF16PtrFromString(exePath)
+	argPtr, _ := syscall.UTF16PtrFromString(args)
+	cwdPtr, _ := syscall.UTF16PtrFromString("")
+
+	shell32 := syscall.NewLazyDLL("shell32.dll")
+	procShellExecute := shell32.NewProc("ShellExecuteW")
+
+	r, _, _ := procShellExecute.Call(
+		0,
+		uintptr(unsafe.Pointer(verbPtr)),
+		uintptr(unsafe.Pointer(exePtr)),
+		uintptr(unsafe.Pointer(argPtr)),
+		uintptr(unsafe.Pointer(cwdPtr)),
+		1, // SW_NORMAL
+	)
+	if r <= 32 {
+		return fmt.Errorf("ShellExecute failed with code %d", r)
+	}
 	return nil
 }
 
