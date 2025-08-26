@@ -3,7 +3,7 @@ MAIN_NAME := $(shell basename $(shell git remote get-url origin) .git)
 MAIN_PREFIX := $(MAIN_NAME)/
 MAIN_VERSION := $(shell chmod +x ./scripts/version.sh 2>/dev/null; ./scripts/version.sh)
 
-OUTPUT_DIR := dist
+DIST := dist
 
 MAKEFILE_LIST ?= Makefile
 
@@ -30,7 +30,8 @@ fmt:
 .PHONY: build
 ## Build the Go binary into the output directory
 build:
-	go build -o $(OUTPUT_DIR)/ \
+	@if [ -f "$(DIST)/locom" ]; then mv "$(DIST)/locom" "$(DIST)/locom.$$($(DIST)/locom version | cut -d' ' -f3)"; fi
+	go build -o $(DIST)/ \
 		-ldflags "-X main.Name=$(MAIN_NAME) -X main.Version=$(MAIN_VERSION)" \
 		./cmd/locom
 

@@ -1,16 +1,16 @@
 package selfsigned
 
 import (
-	"os/exec"
+	"strings"
 )
 
-func windowsTrustCert(certPath string) error {
-	// Windows user root stor
-	return exec.Command("certutil", "-addstore", "-user", "Root", certPath).Run()
+func windowsTrust(caCertPath string) error {
+	// Add to current user Root store
+	return run("certutil", "-addstore", "-user", "Root", caCertPath)
 }
 
-func windowsUntrust() error {
-	exec.Command("certutil", "-delstore", "-user", "Root", "*.locom.self").Run()
-
-	return nil
+func windowsUntrust(sha1hex string) error {
+	// Remove by SHA1 thumbprint from current user Root store
+	// certutil expects hex without spaces
+	return run("certutil", "-delstore", "-user", "Root", strings.ToUpper(sha1hex))
 }

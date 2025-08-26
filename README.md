@@ -114,7 +114,7 @@ Remove-Item -Force .\locom_windows_amd64.tar.gz
 ### Setup
 
 ```sh
-export LOCOM_STAGE=$(locom version | cut -d' ' -f3)
+LOCOM_STAGE=$(locom version | cut -d' ' -f3)
 echo $LOCOM_STAGE
 locom init $LOCOM_STAGE
 cd $LOCOM_STAGE
@@ -126,6 +126,10 @@ cd $LOCOM_STAGE
 Tested on Ubuntu, but may work on other distros without change.
 
 Some commands need sudo on id docker installed by snap.
+
+Prerequisite: `certutil` (NSS)
+
+* `sudo apt install libnss3-tools`
 
 ```sh
 sudo $(which locom) network
@@ -180,6 +184,11 @@ open https://proxy.locom.self
 <summary>Advanced test and troublshooting</summary>
 
 ```sh
+ls /usr/local/share/ca-certificates/
+certutil -d sql:$HOME/.pki/nssdb -L -n "locom-selfsigned" | grep -E "Subject:|Issuer:"
+
+docker container ls # sudo docker container ls
+
 openssl s_client -connect proxy.locom.self:443 -servername proxy.locom.self </dev/null 2>/dev/null   | grep -E "subject=|issuer="
 
 curl -I https://proxy.locom.self
@@ -197,6 +206,10 @@ curl -s -o /dev/null -w "%{http_code}\n" https://proxy.locom.self
 <summary>linux (Ubuntu)</summary>
 
 Tested on Ubuntu, but may work on other distros without change.
+
+If installed `certutil` (NSS), you may want to remove it:
+
+* `sudo apt remove libnss3-tools`
 
 ```sh
 sudo docker compose down

@@ -1,48 +1,77 @@
 package selfsigned
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 )
 
-func linuxTrustCert(certPath string) error {
-	// 1. Install into system trust store (OpenSSL/GnuTLS consumers like curl, git)
-	if err := exec.Command("sudo", "cp", certPath, "/usr/local/share/ca-certificates/locom-selfsigned.crt").Run(); err != nil {
+var linuxIsOtherBrowers = false
+
+func linuxTrust(certPath string) error {
+	// 1) Install into system trust store
+	dest := "/usr/local/share/ca-certificates/" + filepath.Base(certPath)
+	if err := run("sudo", "cp", certPath, dest); err != nil {
 		return err
 	}
-	if err := exec.Command("sudo", "update-ca-certificates").Run(); err != nil {
+	if err := run("sudo", "update-ca-certificates"); err != nil {
 		return err
 	}
 
-	if err := linuxNss(certPath); err != nil {
-		return err
+	// 2) Install into NSS DB for Chrome
+	if err := linuxChromeAddToNSSDB(certPath); err != nil {
+		fmt.Println("⚠ CHrome NSS DB update skipped:", err)
+		fmt.Println("Install libnss3-tools and rerun Trust() to fix Chrome/Chromium trust.")
 	}
 
-	return nil
-}
-
-func linuxNss(certPath string) error {
-	isNss := false
-	if isNss {
-		// 2. Also add to user NSS DB (for Chromium/Firefox/Puppeteer)
-		// Ensure nss-tools installed: sudo apt install libnss3-tools
-		// Create DB if missing
-		if err := exec.Command("mkdir", "-p", filepath.Join(os.Getenv("HOME"), ".pki", "nssdb")).Run(); err != nil {
-			return err
-		}
-		nssdb := "sql:" + filepath.Join(os.Getenv("HOME"), ".pki", "nssdb")
-		if err := exec.Command("certutil", "-d", nssdb, "-A", "-t", "C,,", "-n",
-			"locom-selfsigned", "-i", certPath).Run(); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
 func linuxUntrust() error {
-	exec.Command("sudo", "rm", "/usr/local/share/ca-certificates/locom-selfsigned.crt").Run()
-	exec.Command("sudo", "update-ca-certificates").Run()
+	// 1) Remove from system CA store
+	cand := "/usr/local/share/ca-certificates/" + caCertName
+	_ = run("sudo", "rm", "-f", cand)
+	_ = run("sudo", "update-ca-certificates")
+
+	// 2) Remove from NSS DB
+	if err := linuxChromeRemoveFromNSSDB(); err != nil {
+		fmt.Println("⚠ Could not remove from NSS DB:", err)
+	}
+
+	return nil
+}
+
+func linuxChromeAddToNSSDB(certPath string) error {
+	// Check if certutil exists
+	if _, err := exec.LookPath("certutil"); err != nil {
+		return fmt.Errorf("certutil not found")
+	}
+
+	nssdb := filepath.Join(os.Getenv("HOME"), ".pki", "nssdb")
+	if err := os.MkdirAll(nssdb, 0o755); err != nil {
+		return fmt.Errorf("failed to create NSS DB folder: %w", err)
+	}
+
+	cmd := exec.Command("certutil", "-d", "sql:"+nssdb, "-A", "-t", "C,,",
+		"-n", "locom-selfsigned", "-i", certPath)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to add cert to NSS DB: %v, output: %s", err, string(output))
+	}
+
+	return nil
+}
+
+func linuxChromeRemoveFromNSSDB() error {
+	if _, err := exec.LookPath("certutil"); err != nil {
+		return fmt.Errorf("certutil not found")
+	}
+
+	nssdb := filepath.Join(os.Getenv("HOME"), ".pki", "nssdb")
+	cmd := exec.Command("certutil", "-d", "sql:"+nssdb, "-D", "-n", "locom-selfsigned")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to remove cert from NSS DB: %v, output: %s", err, string(output))
+	}
 
 	return nil
 }
