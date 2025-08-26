@@ -1,5 +1,8 @@
 project_name: locom
 
+version:
+  format: '{{ .Tag | trimPrefix "locom/" | trimPrefix "v" }}'
+
 release:
   github:
     owner: localcompose

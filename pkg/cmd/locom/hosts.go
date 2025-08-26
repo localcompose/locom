@@ -1,13 +1,13 @@
-package cmd
+package locom
 
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -34,11 +34,11 @@ func init() {
 func runHosts(cmd *cobra.Command) error {
 	configPath := ".locom/locom.yml"
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return errors.New("This folder does not contain locom stage configuration.")
+		return errors.New("this folder does not contain locom stage configuration")
 	}
 
 	// Read YAML
-	content, err := ioutil.ReadFile(configPath)
+	content, err := os.ReadFile(configPath)
 	if err != nil {
 		return fmt.Errorf("reading locom.yml: %w", err)
 	}
@@ -62,7 +62,7 @@ func runHosts(cmd *cobra.Command) error {
 	address := parsed.Stage.Network.Bind.Address
 	suffix := parsed.Stage.Network.DNS.Suffix
 	if address == "" || suffix == "" {
-		return errors.New("Missing required fields in locom.yml (stage.network.bind.address or stage.network.dns.suffix)")
+		return errors.New("missing required fields in locom.yml (stage.network.bind.address or stage.network.dns.suffix)")
 	}
 
 	cwd, err := os.Getwd()
@@ -75,14 +75,14 @@ func runHosts(cmd *cobra.Command) error {
 	endMarker := fmt.Sprintf("# <<< locom %s loopback apps <<<", project)
 	entry := fmt.Sprintf("%s proxy%s", address, suffix)
 
-	hostsPath := "/etc/hosts"
+	hostsPath := getHostsPath()
 	tmpHosts, err := os.CreateTemp("", "hosts.*")
 	if err != nil {
 		return fmt.Errorf("creating temp file: %w", err)
 	}
 	defer os.Remove(tmpHosts.Name())
 
-	hostsContent, err := ioutil.ReadFile(hostsPath)
+	hostsContent, err := os.ReadFile(hostsPath)
 	if err != nil {
 		return fmt.Errorf("reading /etc/hosts: %w", err)
 	}
@@ -111,7 +111,7 @@ func runHosts(cmd *cobra.Command) error {
 	)
 
 	updated := strings.Join(newLines, "\n") + "\n"
-	if err := ioutil.WriteFile(tmpHosts.Name(), []byte(updated), 0644); err != nil {
+	if err := os.WriteFile(tmpHosts.Name(), []byte(updated), 0644); err != nil {
 		return fmt.Errorf("writing temp hosts file: %w", err)
 	}
 
@@ -124,7 +124,7 @@ func runHosts(cmd *cobra.Command) error {
 	}
 
 	statePath := ".locom/hosts"
-	if err := ioutil.WriteFile(statePath, []byte(fmt.Sprintf("%s\n%s\n%s\n", beginMarker, entry, endMarker)), 0644); err != nil {
+	if err := os.WriteFile(statePath, []byte(fmt.Sprintf("%s\n%s\n%s\n", beginMarker, entry, endMarker)), 0644); err != nil {
 		return fmt.Errorf("writing state to .locom/hosts: %w", err)
 	}
 
@@ -180,4 +180,21 @@ func verifyHost(expectedAddr, fqdn string) error {
 	}
 	fmt.Printf("✅ TCP connection successful to %s\n", addr)
 	return nil
+}
+
+func getHostsPath() string {
+	switch runtime.GOOS {
+	case "windows":
+		return windowsGetHostsPath()
+	}
+	return "/etc/hosts"
+}
+
+func windowsGetHostsPath() string {
+	hostsPath := `C:\Windows\System32\drivers\etc\hosts`
+	// if _, err := os.Stat(hostsPath); err != nil {
+	// 	// if System32 is redirected, fall back to Sysnative
+	// 	hostsPath = `C:\Windows\Sysnative\drivers\etc\hosts`
+	// }
+	return hostsPath
 }

@@ -3,7 +3,7 @@ package compose_test
 import (
 	"testing"
 
-	"github.com/localcompose/locom/compose"
+	"github.com/localcompose/locom/internal/compose"
 )
 
 func TestGetTraefikCompose(t *testing.T) {

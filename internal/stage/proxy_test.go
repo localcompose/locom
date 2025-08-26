@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/localcompose/locom/stage"
+	"github.com/localcompose/locom/internal/stage"
 )
 
 func TestGenerateProxyComposeFiles(t *testing.T) {
