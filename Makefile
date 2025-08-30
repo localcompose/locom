@@ -39,3 +39,8 @@ build:
 ## Run all Go tests
 test:
 	go test ./...
+
+.PHONY: release
+## Builds a shapshot preview release
+release:
+	goreleaser release
