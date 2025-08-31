@@ -40,7 +40,12 @@ build:
 test:
 	go test ./...
 
+.PHONY: docgen
+# Run docgen helper (local only, not released)
+docgen:
+	go run ./cmd/docgen
+
 .PHONY: release
 ## Builds a shapshot preview release
 release:
-	goreleaser release
+	goreleaser release --auto-snapshot --clean

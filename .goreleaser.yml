@@ -15,7 +15,11 @@ homebrew_casks:
     description: "A command-line tool to help manage local Docker Compose stacks in a clean, self-hosted, offline-friendly way"
 
 builds:
-  - main: ./cmd/locom
+  - main: ./cmd/docgen
+    skip: true # 👈 don't release this one
+  
+  - id: docgen
+    main: ./cmd/locom
     goos: [darwin, linux, windows]
     goarch: [amd64, arm64]
     ignore:
