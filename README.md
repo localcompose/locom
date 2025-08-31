@@ -4,7 +4,7 @@
 
 ## Commands
 
-- `locom new`: Create a minimal config file in the current folder#.
+See [documentation on `locom` command line](./docs/locom.md)
 
 ## Disclaimer
 
