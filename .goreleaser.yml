@@ -1,32 +1,37 @@
+version: 2
 project_name: locom
-
-version:
-  format: '{{ .Tag | trimPrefix "locom/" | trimPrefix "v" }}'
 
 release:
   github:
     owner: localcompose
     name: locom
 
-brews:
+homebrew_casks:
   - name: locom
     repository:
       owner: localcompose
       name: homebrew-locom
-    homepage: "https://github.com/localcompose/locom"
-    description: "Local-only Docker Compose stack manager"
-    test: |
-      locom help
+    homepage: "https://github.com/localcompose"
+    description: "A command-line tool to help manage local Docker Compose stacks in a clean, self-hosted, offline-friendly way"
 
 builds:
-  - main: ./main.go
+  - main: ./cmd/docgen
+    skip: true # 👈 don't release this one
+  
+  - id: docgen
+    main: ./cmd/locom
     goos: [darwin, linux, windows]
     goarch: [amd64, arm64]
+    ignore:
+      - goos: windows
+        goarch: arm
     ldflags: "-s -w -X main.Name={{.ProjectName}} -X main.Version={{.Version}}"
 
 archives:
-  - format: tar.gz
-    name_template: "{{ .ProjectName }}_{{.Version}}_{{ .Os }}_{{ .Arch }}"
+  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
 
 checksum:
   name_template: "checksums.txt"

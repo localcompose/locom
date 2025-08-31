@@ -18,6 +18,10 @@ var rootCmd = &cobra.Command{
 	Long:  `locom is a CLI tool for managing local Docker Compose stacks in a minimal, offline-friendly way.`,
 }
 
+func NewRootCmd() *cobra.Command {
+	return rootCmd
+}
+
 // Execute runs the root command
 func Execute(name, version string) {
 	main.Name = name
