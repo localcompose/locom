@@ -23,7 +23,7 @@ func getHostsPath() string {
 func updateHosts(updatedContent, hostsPath string) error {
 	tryElevated := true
 
-	tmpHosts, err := os.CreateTemp(filepath.Dir(hostsPath), "hosts.*")
+	tmpHosts, err := os.CreateTemp("", "hosts.*")
 	if err != nil {
 		return fmt.Errorf("creating temp file: %w", err)
 	}
