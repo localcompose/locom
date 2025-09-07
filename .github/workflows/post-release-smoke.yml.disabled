@@ -1,0 +1,57 @@
+name: Release smoke test
+
+on:
+  release:
+    types: [published]  # runs when you publish a release
+  workflow_dispatch:     # allows manual run for a given tag
+
+jobs:
+  smoke-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: locom-linux-amd64.tar.gz
+          - os: ubuntu-24.04-arm64
+            asset: locom-linux-arm64.tar.gz
+          - os: macos-latest
+            asset: locom-darwin-amd64.tar.gz
+          - os: windows-latest
+            asset: locom-windows-amd64.zip
+
+    steps:
+      - name: Download release asset
+        run: |
+          gh release download ${{ github.event.release.tag_name }} \
+            --pattern "${{ matrix.asset }}" \
+            --dir ./dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract binaries
+        run: |
+          mkdir -p $HOME/.local/bin
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            powershell -command "Expand-Archive dist\\${{ matrix.asset }} -DestinationPath $env:USERPROFILE\\.local\\bin"
+          else
+            tar -xzf dist/${{ matrix.asset }} -C $HOME/.local/bin
+            chmod +x $HOME/.local/bin/locom
+          fi
+
+      - name: Add to PATH (Linux/macOS)
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+        if: runner.os != 'Windows'
+
+      - name: Add to PATH (Windows)
+        run: echo "${env:USERPROFILE}\.local\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        if: runner.os == 'Windows'
+
+      - name: Smoke test (no args)
+        run: locom || true
+
+      - name: Version check
+        run: locom version
+
+      - name: Hosts verify
+        run: locom hosts --verify

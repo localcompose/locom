@@ -27,9 +27,26 @@ fmt:
 	go mod tidy
 	go fmt ./...
 
+.PHONY: lint
+## Run static analysis and optional checks
+lint:
+	go vet ./...
+#	go test -race -run=^$ ./...
+ifeq ($(CGO_ENABLED),1)
+	go test -race -run=^$ ./...
+else
+	@echo "Skipping race detector (requires CGO_ENABLED=1)"
+endif
+
+# package
 .PHONY: build
-## Build the Go binary into the output directory
+## Build binaries with GoReleaser into the output directory
 build:
+	goreleaser build --auto-snapshot --clean
+
+.PHONY: build.local
+## Build a single local binary with go build
+build.local:
 	@if [ -f "$(DIST)/locom" ]; then mv "$(DIST)/locom" "$(DIST)/locom.$$($(DIST)/locom version | cut -d' ' -f3)"; fi
 	go build -o $(DIST)/ \
 		-ldflags "-X main.Name=$(MAIN_NAME) -X main.Version=$(MAIN_VERSION)" \

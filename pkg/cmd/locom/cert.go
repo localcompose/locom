@@ -18,6 +18,9 @@ func init() {
 var cmdCert = &cobra.Command{
 	Use:   "cert",
 	Short: "Manage certificates for locom",
+	Annotations: map[string]string{
+		"helpdisplayorder": "60",
+	},
 }
 
 var cmdSelfSigned = &cobra.Command{
@@ -37,7 +40,7 @@ var cmdSelfSignedTrust = &cobra.Command{
 	Use:   "trust",
 	Short: "trust the self-signed certificate for .locom.self",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return selfsigned.Trust()
+		return selfsigned.TrustSetup()
 	},
 }
 
@@ -46,7 +49,7 @@ var cmdSelfSignedUntrust = &cobra.Command{
 	Use:   "untrust",
 	Short: "Remove/unregister the self-signed certificate from all trust stores",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return selfsigned.Untrust()
+		return selfsigned.TrustCleanup()
 	},
 }
 

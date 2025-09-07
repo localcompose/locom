@@ -1,0 +1,174 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  # Build artifacts per OS/arch
+  build:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-24.04-arm64
+            arch: arm64
+          - os: macos-latest
+            arch: amd64
+          # - os: macos-14-arm64   # if available to your org
+          #   arch: arm64
+          - os: windows-latest
+            arch: amd64
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+
+      - name: Build
+        run: |
+          mkdir -p $HOME/.local/bin
+          go build -o $HOME/.local/bin/locom ./cmd/locom
+        shell: bash
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: locom-${{ matrix.os }}-${{ matrix.arch }}
+          path: $HOME/.local/bin/locom
+
+  # Smoke test the released artifacts
+  smoke-test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-24.04-arm64
+            arch: arm64
+          - os: macos-latest
+            arch: amd64
+          # - os: macos-14-arm64
+          #   arch: arm64
+          - os: windows-latest
+            arch: amd64
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: locom-${{ matrix.os }}-${{ matrix.arch }}
+          path: $HOME/.local/bin
+
+      - name: Add to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+        if: runner.os != 'Windows'
+
+      - name: Add to PATH (Windows)
+        run: echo "${env:USERPROFILE}\.local\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        if: runner.os == 'Windows'
+
+      - name: Smoke test (no args)
+        run: locom || true
+
+      - name: Version check
+        run: locom version
+
+      - name: Hosts verify
+        run: locom hosts --verify
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  # Build artifacts per OS/arch
+  build:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-24.04-arm64
+            arch: arm64
+          - os: macos-latest
+            arch: amd64
+          # - os: macos-14-arm64   # if available to your org
+          #   arch: arm64
+          - os: windows-latest
+            arch: amd64
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+
+      - name: Build
+        run: |
+          mkdir -p $HOME/.local/bin
+          go build -o $HOME/.local/bin/locom ./cmd/locom
+        shell: bash
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: locom-${{ matrix.os }}-${{ matrix.arch }}
+          path: $HOME/.local/bin/locom
+
+  # Smoke test the released artifacts
+  smoke-test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-24.04-arm64
+            arch: arm64
+          - os: macos-latest
+            arch: amd64
+          # - os: macos-14-arm64
+          #   arch: arm64
+          - os: windows-latest
+            arch: amd64
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: locom-${{ matrix.os }}-${{ matrix.arch }}
+          path: $HOME/.local/bin
+
+      - name: Add to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+        if: runner.os != 'Windows'
+
+      - name: Add to PATH (Windows)
+        run: echo "${env:USERPROFILE}\.local\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        if: runner.os == 'Windows'
+
+      - name: Smoke test (no args)
+        run: locom || true
+
+      - name: Version check
+        run: locom version
+
+      - name: Hosts verify
+        run: locom hosts --verify

@@ -14,7 +14,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -133,43 +132,6 @@ func Setup() error {
 	}
 
 	return nil
-}
-
-// Trust installs the CA into the OS trust store. Requires privileges on Linux/macOS.
-func Trust() error {
-	caCertPath := filepath.Join(defaultCertsDir, caCertName)
-	if _, err := os.Stat(caCertPath); err != nil {
-		return fmt.Errorf("CA not found: %w", err)
-	}
-	switch runtime.GOOS {
-	case "linux":
-		return linuxTrust(caCertPath)
-	case "darwin":
-		return darwinTrust(caCertPath)
-	case "windows":
-		return windowsTrust(caCertPath)
-	default:
-		return fmt.Errorf("trust not implemented for %s", runtime.GOOS)
-	}
-}
-
-// Untrust removes the CA from the OS trust store using its fingerprint.
-func Untrust() error {
-	caCertPath := filepath.Join(defaultCertsDir, caCertName)
-	sha, err := fileSHA1Fingerprint(caCertPath)
-	if err != nil {
-		return err
-	}
-	switch runtime.GOOS {
-	case "linux":
-		return linuxUntrust()
-	case "darwin":
-		return darwinUntrust(sha)
-	case "windows":
-		return windowsUntrust(sha)
-	default:
-		return fmt.Errorf("untrust not implemented for %s", runtime.GOOS)
-	}
 }
 
 // Cleanup removes generated files (does not edit trust stores)

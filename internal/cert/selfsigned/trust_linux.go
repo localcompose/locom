@@ -1,3 +1,5 @@
+//go:build linux
+
 package selfsigned
 
 import (
@@ -9,7 +11,7 @@ import (
 
 var linuxIsOtherBrowers = false
 
-func linuxTrust(certPath string) error {
+func trust(certPath string) error {
 	// 1) Install into system trust store
 	dest := "/usr/local/share/ca-certificates/" + filepath.Base(certPath)
 	if err := run("sudo", "cp", certPath, dest); err != nil {
@@ -28,7 +30,7 @@ func linuxTrust(certPath string) error {
 	return nil
 }
 
-func linuxUntrust() error {
+func untrust(_ string) error {
 	// 1) Remove from system CA store
 	cand := "/usr/local/share/ca-certificates/" + caCertName
 	_ = run("sudo", "rm", "-f", cand)

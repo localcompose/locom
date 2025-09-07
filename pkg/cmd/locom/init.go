@@ -14,7 +14,10 @@ var cmdInit = &cobra.Command{
 	Short: "Initialize a new locom stage in the specified folder",
 	Long: `Creates a .locom directory and a default locom.yml config file 
 inside the given folder. Fails if the folder is not empty.`,
-	Args: cobra.MaximumNArgs(1),
+	Annotations: map[string]string{
+		"helpdisplayorder": "20",
+	},
+Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		target := "."
 		if len(args) == 1 {
