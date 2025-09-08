@@ -17,7 +17,7 @@ inside the given folder. Fails if the folder is not empty.`,
 	Annotations: map[string]string{
 		"helpdisplayorder": "20",
 	},
-Args: cobra.MaximumNArgs(1),
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		target := "."
 		if len(args) == 1 {

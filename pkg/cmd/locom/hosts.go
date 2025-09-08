@@ -8,8 +8,8 @@ import (
 )
 
 var cmdHosts = &cobra.Command{
-	Use:          "hosts",
-	Short:        "Update /etc/hosts with entries from locom stage",
+	Use:   "hosts",
+	Short: "Update /etc/hosts with entries from locom stage",
 	Annotations: map[string]string{
 		"helpdisplayorder": "40",
 	},
