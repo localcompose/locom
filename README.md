@@ -1,5 +1,8 @@
 # locom
 
+[![Test](https://github.com/localcompose/locom/actions/workflows/test.yml/badge.svg)](https://github.com/localcompose/locom/actions/workflows/test.yml)
+[![Release](https://github.com/localcompose/locom/actions/workflows/release.yml/badge.svg)](https://github.com/localcompose/locom/actions/workflows/release.yml)
+
 **locom** (short for "local compose") is a command-line tool to help manage local Docker Compose stacks in a clean, self-hosted, offline-friendly way.
 
 ## Commands
