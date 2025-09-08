@@ -1,10 +1,13 @@
 # locom
 
+[![Test](https://github.com/localcompose/locom/actions/workflows/test.yml/badge.svg)](https://github.com/localcompose/locom/actions/workflows/test.yml)
+[![Release](https://github.com/localcompose/locom/actions/workflows/release.yml/badge.svg)](https://github.com/localcompose/locom/actions/workflows/release.yml)
+
 **locom** (short for "local compose") is a command-line tool to help manage local Docker Compose stacks in a clean, self-hosted, offline-friendly way.
 
 ## Commands
 
-- `locom new`: Create a minimal config file in the current folder#.
+See [documentation on `locom` command line](./docs/locom.md)
 
 ## Disclaimer
 
@@ -39,8 +42,7 @@ tar -xvzf locom_linux_amd64.tar.gz
 chmod +x locom
 sudo mv -f locom /usr/local/bin/
 
-# ---- Cleanup (use with caution)
-# Run only if you installed this version. Future versions may differ.
+# ---- Remove after testing / cleanup
 sudo rm -f /usr/local/bin/locom
 rm -f locom_linux_amd64.tar.gz
 ```
@@ -77,16 +79,19 @@ rm -f locom_darwin_amd64.tar.gz
 <details>
 <summary>Git Bash for Windows</summary>
 
-```zsh
+```bash
+# Download and extract
 curl -LO https://github.com/localcompose/locom/releases/download/0.0.3-poc/locom_windows_amd64.tar.gz
 tar -xvzf locom_windows_amd64.tar.gz
 
 # Move to System32 (always in PATH) via runas
-winpty runas /user:$USERNAME "cmd /c move /Y locom.exe %SystemRoot%\System32\"
+# ⚠️ Depending on your UAC settings, you may be prompted for elevation.
+winpty powershell -c "saps cmd -Verb RunAs -Args '/c move /Y \"$(pwd -W)\\locom.exe\" %SystemRoot%\System32\'"
 
-# ---- Cleanup (use with caution)
-# Run only if you installed this version. Future versions may differ.
-winpty runas /user:$USERNAME "cmd /c del /Q %SystemRoot%\System32\locom.exe"
+
+# ---- Cleanup
+# ⚠️ Depending on your UAC settings, you may be prompted for elevation.
+winpty powershell -c "saps cmd -Verb RunAs -Args '/c del /F /Q %SystemRoot%\System32\locom.exe'"
 rm -f locom_windows_amd64.tar.gz
 ```
 </details>

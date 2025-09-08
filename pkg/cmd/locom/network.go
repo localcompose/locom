@@ -14,6 +14,9 @@ import (
 var cmdNetwork = &cobra.Command{
 	Use:   "network",
 	Short: "Ensure the Docker network defined in .locom/locom.yml exists",
+	Annotations: map[string]string{
+		"helpdisplayorder": "30",
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		configPath := filepath.Join(".locom", "locom.yml")
 		cfg, err := config.LoadConfig(configPath)
