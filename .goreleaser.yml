@@ -6,18 +6,19 @@ release:
     owner: localcompose
     name: locom
 
-homebrew_casks:
-  - name: locom
-    repository:
-      owner: localcompose
-      name: homebrew-locom
-    homepage: "https://github.com/localcompose"
-    description: "A command-line tool to help manage local Docker Compose stacks in a clean, self-hosted, offline-friendly way"
+# consider moving it to separate pipeline 
+# homebrew_casks:
+#   - name: locom
+#     repository:
+#       owner: localcompose
+#       name: homebrew-locom
+#     homepage: "https://github.com/localcompose"
+#     description: "A command-line tool to help manage local Docker Compose stacks in a clean, self-hosted, offline-friendly way"
 
 builds:
   - id: docgen
     main: ./cmd/docgen
-    skip: true # 👈 don't release this one
+    skip: true
   
   - id: locom
     main: ./cmd/locom
