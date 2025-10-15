@@ -2,9 +2,13 @@ name: Test
 
 on:
   push:
-    branches: [main]
+    branches: 
+      - main
   pull_request:
-    branches: [main]
+    branches: 
+      - main
+      - prepare/v*
+  workflow_dispatch:
 
 jobs:
   test:
