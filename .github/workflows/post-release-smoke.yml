@@ -51,13 +51,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract binaries
+        shell: bash
         run: |
-          mkdir -p $HOME/.local/bin
+          mkdir -p "$HOME/.local/bin"
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-            powershell -command "Expand-Archive dist\\${{ matrix.asset }} -DestinationPath $env:USERPROFILE\\.local\\bin"
+            # Resolve Windows HOME properly
+            pwsh -NoLogo -NoProfile -Command '
+              $dest = Join-Path $env:USERPROFILE ".local\bin";
+              New-Item -ItemType Directory -Force -Path $dest | Out-Null;
+              Expand-Archive "dist\\${{ matrix.asset }}" -DestinationPath $dest -Force
+            '
           else
-            tar -xzf dist/${{ matrix.asset }} -C $HOME/.local/bin
-            chmod +x $HOME/.local/bin/locom
+            tar -xzf "dist/${{ matrix.asset }}" -C "$HOME/.local/bin"
+            chmod +x "$HOME/.local/bin/locom"
           fi
 
       - name: Add to PATH (Linux/macOS)
