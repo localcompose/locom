@@ -6,9 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to test (e.g., v1.2.3)"
+        description: "Release tag to test"
         required: true
-        default: "latest"
+        type: choice
+        options:
+          - 0.0.3-poc
+          - v0.0.2
+          - v0.0.1
 
 jobs:
   smoke-test:
@@ -28,6 +32,7 @@ jobs:
     steps:
       - name: Determine release tag
         id: vars
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "tag_name=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
@@ -36,6 +41,7 @@ jobs:
           fi
 
       - name: Download release asset
+        shell: bash
         run: |
           gh release download "${{ steps.vars.outputs.tag_name }}" \
             --repo "${{ github.repository }}" \
