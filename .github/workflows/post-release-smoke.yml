@@ -89,6 +89,14 @@ jobs:
           cd stage
           locom hosts --verify
 
+
+      - name: Install Docker via Colima (experimental)
+        if: runner.os == 'macOS'
+        run: |
+          brew install docker colima
+          colima start --cpu 2 --memory 4
+          docker ps
+
       - name: Network
         run: |
           docker info
