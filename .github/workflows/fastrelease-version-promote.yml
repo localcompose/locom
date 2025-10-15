@@ -1,0 +1,17 @@
+name: "CDraft Promote — Publish draft release to main (dry run)"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag to promote (e.g., v0.0.3-poc)"
+        required: true
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder success
+        run: echo "This is a placeholder workflow to register 'FastRelease Init' in Actions. Always succeeds."
+
+      - name: Show Github Context
+        uses: ./.github/actions/show-github-context

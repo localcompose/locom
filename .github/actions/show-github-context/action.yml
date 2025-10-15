@@ -1,0 +1,39 @@
+name: "Show Github Context"
+description: "Reusable step for dry runs that shows GitHub context information."
+runs:
+  using: "composite"
+  steps:
+    - name: Show GitHub context
+    env:
+        # Optional: GitHub sets these automatically
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_SHA: ${{ github.sha }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
+        GITHUB_BASE_REF: ${{ github.base_ref }}
+    run: |
+        echo ""
+        echo "=== Basic GitHub Variables ==="
+        echo "github.ref: $GITHUB_REF"
+        echo "github.sha: $GITHUB_SHA"
+        echo "github.event_name: $GITHUB_EVENT_NAME"
+        echo "github.head_ref (PR source branch): $GITHUB_HEAD_REF"
+        echo "github.base_ref (PR target branch): $GITHUB_BASE_REF"
+
+        echo ""
+        echo "=== Workflow Dispatch Inputs ==="
+        if [ -n "${{ toJson(github.event.inputs) }}" ]; then
+        echo "${{ toJson(github.event.inputs) }}" | jq
+        else
+        echo "No inputs provided."
+        fi
+
+        echo ""
+        echo "=== Full GitHub Context Dump ==="
+        # Dump the entire github context as JSON
+        echo "${{ toJson(github) }}" | jq
+
+        echo ""
+        echo "=== Full Event Payload ==="
+        # Dump the event payload as JSON
+        echo "${{ toJson(github.event) }}" | jq

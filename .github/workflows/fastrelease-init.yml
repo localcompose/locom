@@ -1,0 +1,17 @@
+name: "FastRelease Init — Initialize fast release process for the next version (placeholder)"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag to initialize (e.g., v0.0.3-poc)"
+        required: true
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder success
+        run: echo "This is a placeholder workflow to register 'FastRelease Init' in Actions. Always succeeds."
+
+      - name: Show Github Context
+        uses: ./.github/actions/show-github-context

@@ -1,8 +1,8 @@
 # locom
 
 [![License](https://img.shields.io/github/license/localcompose/locom)](LICENSE)
-[![22](https://pkg.go.dev/badge/github.com/localcompose/locom.svg)](https://localcompose.github.io/prerelease/v0.0.3-poc/cli-reference/)
-[![Version](https://img.shields.io/badge/version-0.0.3--poc-blue)](https://github.com/localcompose/locom/releases/tag/0.0.3-poc)
+[![22](https://pkg.go.dev/badge/github.com/localcompose/locom.svg)](https://pkg.go.dev/github.com/localcompose/locom@v0.0.3-poc)
+[![Version](https://img.shields.io/badge/version-v0.0.3--poc-blue)](https://github.com/localcompose/locom/releases/tag/v0.0.3-poc)
 [![Test](https://github.com/localcompose/locom/actions/workflows/test.yml/badge.svg)](https://github.com/localcompose/locom/actions/workflows/test.yml)
 [![Release](https://github.com/localcompose/locom/actions/workflows/release.yml/badge.svg)](https://github.com/localcompose/locom/actions/workflows/release.yml)
 

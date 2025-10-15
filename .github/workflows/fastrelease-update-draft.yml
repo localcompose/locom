@@ -1,0 +1,15 @@
+name: "FastRelease Update Draft — Sync draft branch and tag (placeholder)"
+on:
+  push:
+    branches:
+      - 'draft/*'
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder success
+        run: echo "This is a placeholder workflow to register 'FastRelease Update Draft' in Actions. Always succeeds."
+
+      - name: Show Github Context
+        uses: ./.github/actions/show-github-context

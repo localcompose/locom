@@ -16,6 +16,8 @@ func main() {
 	rootCmd := locom.NewRootCmd()
 
 	// Generate Markdown docs
+	outDir := filepath.Join(".", "docs")
+	os.MkdirAll(outDir, 0755)
 	err := doc.GenMarkdownTree(rootCmd, "./docs")
 	if err != nil {
 		log.Fatal(err)

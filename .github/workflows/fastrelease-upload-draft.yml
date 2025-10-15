@@ -1,0 +1,15 @@
+name: "FastRelease Upload Draft — draft release prepare (placeholder)"
+on:
+  push:
+    tags:
+      - 'v*.*.**' # match tags like v1.2.3 and v1.2.3-poc; adapt if needed
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder success
+        run: echo "This is a placeholder workflow to register 'FastRelease Upload Draft ' in Actions. Always succeeds."
+
+      - name: Show Github Context
+        uses: ./.github/actions/show-github-context
