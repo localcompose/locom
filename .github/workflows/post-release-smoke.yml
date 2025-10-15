@@ -37,7 +37,8 @@ jobs:
 
       - name: Download release asset
         run: |
-          gh release download ${{ steps.vars.outputs.tag_name }} \
+          gh release download "${{ steps.vars.outputs.tag_name }}" \
+            --repo "${{ github.repository }}" \
             --pattern "${{ matrix.asset }}" \
             --dir ./dist
         env:
