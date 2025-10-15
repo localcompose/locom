@@ -68,5 +68,10 @@ jobs:
       - name: Version check
         run: locom version
 
+      - name: Stage init
+        run: locom init stage
+
       - name: Hosts verify
-        run: locom hosts --verify
+        run: |
+          cd stage
+          locom hosts --verify
