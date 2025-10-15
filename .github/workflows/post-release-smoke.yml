@@ -2,8 +2,13 @@ name: Release smoke test
 
 on:
   release:
-    types: [published]  # runs when you publish a release
-  workflow_dispatch:     # allows manual run for a given tag
+    types: [published]  # runs automatically on published release
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to test (e.g., v1.2.3)"
+        required: true
+        default: "latest"
 
 jobs:
   smoke-test:
@@ -21,9 +26,18 @@ jobs:
             asset: locom-windows-amd64.zip
 
     steps:
+      - name: Determine release tag
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag_name=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Download release asset
         run: |
-          gh release download ${{ github.event.release.tag_name }} \
+          gh release download ${{ steps.vars.outputs.tag_name }} \
             --pattern "${{ matrix.asset }}" \
             --dir ./dist
         env:
