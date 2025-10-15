@@ -18,8 +18,8 @@ jobs:
         include:
           - os: ubuntu-latest
             asset: locom_linux_amd64.tar.gz
-          - os: ubuntu_24.04_arm64
-            asset: locom_linux_arm64.tar.gz
+          # - os: ubuntu_24.04_arm64
+          #   asset: locom_linux_arm64.tar.gz
           - os: macos-latest
             asset: locom_darwin_amd64.tar.gz
           - os: windows-latest
@@ -45,6 +45,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract binaries
+        shell: bash
         run: |
           mkdir -p $HOME/.local/bin
           if [[ "${{ runner.os }}" == "Windows" ]]; then
