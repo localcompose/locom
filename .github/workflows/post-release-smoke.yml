@@ -17,13 +17,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            asset: locom-linux-amd64.tar.gz
-          - os: ubuntu-24.04-arm64
-            asset: locom-linux-arm64.tar.gz
+            asset: locom_linux_amd64.tar.gz
+          - os: ubuntu_24.04_arm64
+            asset: locom_linux_arm64.tar.gz
           - os: macos-latest
-            asset: locom-darwin-amd64.tar.gz
+            asset: locom_darwin_amd64.tar.gz
           - os: windows-latest
-            asset: locom-windows-amd64.zip
+            asset: locom_windows_amd64.zip
 
     steps:
       - name: Determine release tag
