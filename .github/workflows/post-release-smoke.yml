@@ -91,6 +91,10 @@ jobs:
 
       - name: Network
         run: |
+          docker info
+          echo "=================" 
+          docker info | grep -i rootless
+          echo "=================" 
           cd stage
           locom network
 
@@ -109,6 +113,8 @@ jobs:
 
       - name: curl
         run: |
+          cat /etc/hosts
+          echo "=================" 
           curl -I https://proxy.locom.self
           curl https://proxy.locom.self
           curl -L https://proxy.locom.self
